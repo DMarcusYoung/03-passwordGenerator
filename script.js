@@ -1,48 +1,41 @@
 //Arrays of characters split by type
 const numbers = ['0','1','2','3','4','5','6','7','8','9'];
 const lowLetters = ['a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z'];
-const upLetters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
-const specialChar = ["!","@","#","$","%","^","&","*","(",")","_","+","[","]","{","}",";",":","'",'"',",",".","/","<",">","?"]
+const upLetters = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'];
+const specialChar = ["!","@","#","$","%","^","&","*","(",")","_","+","[","]","{","}",";",":","'",'"',",",".","/","<",">","?"];
 
 //Generate Password button functionality
 document.querySelector("#generate").addEventListener("click", function(){
-    //Prompting user for desired password choices + var declaration
+    //Declaring variables
     let charList = [];
-    let charNum = prompt("How many characters do you want your password to be?");
-        //Checking that the number of characters for the password is between 8 and 128
-        if(charNum < 8 || charNum > 128){
-            alert("Your password must be between 8 and 128 characters");
-            charNum = prompt("How many characters do you want your password to be?");
-        }
-    let hasNum = confirm("Do you want numbers in your password?");
-    let hasLowLetters = confirm("Do you want lowercase letters in your password?");
-    let hasUpLetters = confirm("Do you want uppercase letters in your password?");
-    let hasSpecialChar = confirm("Do you want special characters in your password?");
+    let charNum = document.getElementById("passwordLength").value;
     let password = '';
-    //If user chooses to use a certain type of character, that type's array are added to a master array used later for randomization
-    if(hasNum) {
-        charList = charList.concat(numbers);
+    let charTypeCount = 0;
+    let randomPassPos = Math.floor(Math.random() * (password.length+1));
+
+    //Checking that the number of characters for the password is between 8 and 128
+    if(charNum < 8 || charNum > 128){
+        document.querySelector("#password").textContent = "Your password must be between 8 and 128 characters long"
+        return
     }
-    if(hasLowLetters){
-        charList = charList.concat(lowLetters);
+    //Adds a random character from selected array into a random spot to ensure one of each selected type of character is added and adds that character type array to the master array for later randomization
+    function addCharType(elId, charArray){
+        if(document.getElementById(elId).checked) {
+            randomPassPos = Math.floor(Math.random() * (password.length+1));
+            password = password.substr(0, randomPassPos) + charArray[Math.floor(Math.random() * (charArray.length))] + password.substr(randomPassPos);
+            charList = charList.concat(charArray);
+            charTypeCount++;
+        }
     }
-    if(hasUpLetters){
-        charList = charList.concat(upLetters);
-    }
-    if(hasSpecialChar){
-        charList = charList.concat(specialChar);
-    }
-    //Checking that user chose at least one type of character
-    if(hasNum === false && hasLowLetters === false && hasUpLetters === false && hasSpecialChar === false){
-        alert("You have to have one type of character to make a password")
-        hasNum = confirm("Do you want numbers in your password?");
-        hasLowLetters = confirm("Do you want lowercase letters in your password?");
-        hasUpLetters = confirm("Do you want uppercase letters in your password?");
-        hasSpecialChar = confirm("Do you want special characters in your password?");
-    }
-    //Loops through randomly choosing a character within the master password array the chosen character length times.
-    for(let i = 0; i < charNum; i++){
-        password = password + charList[Math.floor(Math.random() * charList.length)];
+    // running the above function for each type of character
+    addCharType("numBox", numbers);
+    addCharType("lowBox", lowLetters);
+    addCharType("upBox", upLetters);
+    addCharType("symbolBox", specialChar);
+
+    //Loops through randomly choosing a character within the master password array and randomly placing it in the password the chosen password length times.
+    for(let i = 0; i < (charNum-charTypeCount); i++){
+        password = password.substr(0, randomPassPos) + charList[Math.floor(Math.random() * (charList.length))] + password.substr(randomPassPos);
     }
 
     document.querySelector("#password").textContent = password;
